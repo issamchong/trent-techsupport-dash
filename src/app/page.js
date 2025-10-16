@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { getPaginatedTickets } from '../use-cases/getPaginatedTickets';
 import { getPaginatedOrders } from '../use-cases/getPaginatedOrders';
-import { HomeIcon, TicketIcon, ShoppingBagIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, TicketIcon, ShoppingBagIcon, ChevronLeftIcon, ChevronRightIcon, ChartBarIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import TicketDetails from '../components/TicketDetails';
 import OrderDetails from '../components/OrderDetails';
+import GeneralOverview from '../components/GeneralOverview';
+import OrderFlow from '../components/OrderFlow';
 
 // Sidebar Component
 const Sidebar = ({ setView, onResetView }) => {
@@ -21,6 +23,14 @@ const Sidebar = ({ setView, onResetView }) => {
             </div>
             <nav className="mt-4">
                 <ul>
+                    <li className="flex items-center px-6 py-3 hover:bg-gray-700 cursor-pointer transition-colors duration-200" onClick={() => handleNavigation('overview')}>
+                        <ChartBarIcon className="h-6 w-6 mr-3" />
+                        <span className="text-lg">Overview</span>
+                    </li>
+                    <li className="flex items-center px-6 py-3 hover:bg-gray-700 cursor-pointer transition-colors duration-200" onClick={() => handleNavigation('order-flow')}>
+                        <BeakerIcon className="h-6 w-6 mr-3" />
+                        <span className="text-lg">Order Flow</span>
+                    </li>
                     <li className="flex items-center px-6 py-3 hover:bg-gray-700 cursor-pointer transition-colors duration-200" onClick={() => handleNavigation('tickets')}>
                         <TicketIcon className="h-6 w-6 mr-3" />
                         <span className="text-lg">Tickets</span>
@@ -158,7 +168,7 @@ const OrderList = ({ onOrderSelect }) => {
 
 
 export default function Home() {
-  const [view, setView] = useState('tickets');
+  const [view, setView] = useState('overview');
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -184,18 +194,25 @@ export default function Home() {
   };
 
   const renderContent = () => {
-    if (view === 'tickets') {
       if (selectedTicket) {
         return <TicketDetails ticket={selectedTicket} onBack={handleBackToTickets} />;
       }
-      return <TicketList onTicketSelect={handleTicketSelect} />;
-    } else if (view === 'orders') {
       if (selectedOrder) {
         return <OrderDetails order={selectedOrder} onBack={handleBackToOrders} />;
       }
-      return <OrderList onOrderSelect={handleOrderSelect} />;
-    }
-    return null;
+
+      switch (view) {
+        case 'overview':
+            return <GeneralOverview />;
+        case 'order-flow':
+            return <OrderFlow />;
+        case 'tickets':
+            return <TicketList onTicketSelect={handleTicketSelect} />;
+        case 'orders':
+            return <OrderList onOrderSelect={handleOrderSelect} />;
+        default:
+            return <GeneralOverview />;
+      }
   };
 
   return (
